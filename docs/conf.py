@@ -15,9 +15,9 @@ from importlib import metadata
 
 # -- Project information -----------------------------------------------------
 
-project = 'pimms'
-copyright = '2023, Henry Webel'
-author = 'Henry Webel'
+project = "pimms"
+copyright = "2023, Henry Webel"
+author = "Henry Webel"
 
 PACKAGE_VERSION = metadata.version("pimms-learn")
 version = PACKAGE_VERSION
@@ -30,25 +30,23 @@ release = PACKAGE_VERSION
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.napoleon',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autodoc.typehints',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.viewcode',
-    'myst_nb',
-    'sphinx_new_tab_link',
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autodoc.typehints",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+    "myst_nb",
+    "sphinx_new_tab_link",
 ]
 
-myst_enable_extensions = [
-    "strikethrough",
-    "dollarmath",
-    "amsmath"
-]
+myst_enable_extensions = ["strikethrough", "dollarmath", "amsmath"]
 
 
 # Plolty support through require javascript library
 # https://myst-nb.readthedocs.io/en/latest/render/interactive.html#plotly
-html_js_files = ["https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"]
+html_js_files = [
+    "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"
+]
 
 #  https://myst-nb.readthedocs.io/en/latest/computation/execute.html
 nb_execution_mode = "auto"
@@ -62,16 +60,17 @@ nb_execution_raise_on_error = True
 nb_merge_streams = True
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build',
-                    'Thumbs.db',
-                    '.DS_Store',
-                    'jupyter_execute',  # avoid local re-execution of written nbs during development
-                    ]
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "jupyter_execute",  # avoid local re-execution of written nbs during development
+]
 
 # Intersphinx options
 intersphinx_mapping = {
@@ -88,8 +87,8 @@ intersphinx_mapping = {
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-html_theme = 'sphinx_book_theme'  # pip install sphinx-book-theme
-html_logo = 'logos/logo.png'
+html_theme = "sphinx_book_theme"  # pip install sphinx-book-theme
+html_logo = "logos/logo.png"
 html_favicon = "logos/logo_thumbnail.png"
 
 # See:
@@ -135,17 +134,20 @@ if os.environ.get("READTHEDOCS") == "True":
 
     def run_apidoc(_):
         from sphinx.ext import apidoc
-        apidoc.main([
-            "--force",
-            "--implicit-namespaces",
-            "--module-first",
-            # "--separate",
-            "-o",
-            str(PROJECT_ROOT / "docs" / "reference"),
-            str(PACKAGE_ROOT),
-            str(PACKAGE_ROOT / "*.c"),
-            str(PACKAGE_ROOT / "*.so"),
-        ])
+
+        apidoc.main(
+            [
+                "--force",
+                "--implicit-namespaces",
+                "--module-first",
+                # "--separate",
+                "-o",
+                str(PROJECT_ROOT / "docs" / "reference"),
+                str(PACKAGE_ROOT),
+                str(PACKAGE_ROOT / "*.c"),
+                str(PACKAGE_ROOT / "*.so"),
+            ]
+        )
 
     def setup(app):
-        app.connect('builder-inited', run_apidoc)
+        app.connect("builder-inited", run_apidoc)
