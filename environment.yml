@@ -10,7 +10,7 @@ channels:
 dependencies:
   - python>=3.9,<=3.12
   - numpy
-  - pandas>=1
+  - pandas>=1,<3.0
   - scipy>=1.6
   # plotting
   - matplotlib>=3.4
@@ -23,6 +23,7 @@ dependencies:
   # - pytorch-cuda
   - scikit-learn
   - fastai
+  - fastprogress<1.1.0
   - torchvision
   # - cudatoolkit #=11.7
   # - tensorboard
