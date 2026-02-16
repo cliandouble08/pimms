@@ -116,7 +116,7 @@ def plot_training_losses(
         norm_train=norm_train,
         norm_val=norm_val,
     )
-    if not folder is None:
+    if folder is not None:
         name = name.lower()
         _ = RecorderDump(learner.recorder, name).save(folder)
         pimmslearn.savefig(fig, name=f"{name}_training", folder=folder)
