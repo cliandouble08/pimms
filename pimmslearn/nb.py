@@ -37,8 +37,10 @@ class Config:
             try:
                 fname = self.out_folder
                 fname = Path(fname) / "model_config.yml"
-            except AttributeError:
-                raise AttributeError('Specify fname or set "out_folder" attribute.')
+            except AttributeError as e:
+                raise AttributeError(
+                    'Specify fname or set "out_folder" attribute.'
+                ) from e
         d = pimmslearn.io.parse_dict(input_dict=self.__dict__)
         with open(fname, "w") as f:
             yaml.dump(d, f)

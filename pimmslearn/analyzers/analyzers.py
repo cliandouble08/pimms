@@ -418,11 +418,11 @@ class LatentAnalysis(Analysis):
     def _plot(self, fct, meta_key: str, save: bool = True):
         try:
             meta_data = self.meta_data[meta_key]
-        except KeyError:
+        except KeyError as e:
             raise ValueError(
                 f"Requested key: '{meta_key}' is not in available,"
                 f" use: {', '.join(x for x in self.meta_data.columns)}"
-            )
+            ) from e
         fig, ax = plt.subplots(figsize=self.fig_size)
         _ = fct(
             df=self.latent_reduced,

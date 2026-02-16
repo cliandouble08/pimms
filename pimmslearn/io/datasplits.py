@@ -178,11 +178,11 @@ class DataSplits:
         elif issubclass(type(dataset), str):
             try:
                 ds = getattr(self, dataset)
-            except AttributeError:
+            except AttributeError as e:
                 raise AttributeError(
                     f"Please provide a valid attribute, not '{dataset}'. "
                     "Valid attributes are {}".format(", ".join(x for x in self._items))
-                )
+                ) from e
             if dataset[-1] in ["y", "Y"]:
                 logger.warning(
                     f"Attempting to interpolate target: {dataset} "
