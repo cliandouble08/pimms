@@ -12,7 +12,7 @@ DEFAULT_DTYPE = torch.get_default_dtype()
 class PeptideDatasetInMemory(Dataset):
     """Peptide Dataset fully in memory."""
 
-    nan = torch.tensor(float('NaN'))
+    nan = torch.tensor(float("NaN"))
 
     def __init__(self, data: np.array, mask: np.array = None, fill_na=0.0):
         """Build torch.Tensors for DataLoader.
@@ -36,11 +36,11 @@ class PeptideDatasetInMemory(Dataset):
         self.y = torch.where(~self.mask, self.peptides, self.nan)
 
         if mask is not None:
-            self.peptides = torch.where(
-                ~self.mask, self.nan, self.peptides)
+            self.peptides = torch.where(~self.mask, self.nan, self.peptides)
 
-        self.peptides = torch.where(self.peptides.isnan(),
-                                    torch.FloatTensor([fill_na]), self.peptides)
+        self.peptides = torch.where(
+            self.peptides.isnan(), torch.FloatTensor([fill_na]), self.peptides
+        )
 
         self.length_ = len(self.peptides)
 
@@ -62,17 +62,17 @@ class DatasetWithMaskAndNoTarget(Dataset):
 
     def __init__(self, df: pd.DataFrame, transformer: sklearn.pipeline.Pipeline = None):
         if not issubclass(type(df), pd.DataFrame):
-            raise ValueError(
-                f'please pass a pandas DataFrame, not: {type(df) = }')
+            raise ValueError(f"please pass a pandas DataFrame, not: {type(df) = }")
         self.mask_isna = df.isna()  # .astype('uint8') # in case 0,1 is preferred
         self.columns = df.columns
         self.transformer = transformer
         if transformer:
-            if hasattr(transformer, 'transform'):
+            if hasattr(transformer, "transform"):
                 df = transformer.transform(df)
             else:
                 raise AttributeError(
-                    f'{type(transformer)} is not sklearn compatible, has no inverse_transform.')
+                    f"{type(transformer)} is not sklearn compatible, has no inverse_transform."
+                )
         self.data = df
         self.length_ = len(self.data)
 
@@ -95,8 +95,12 @@ class DatasetWithTarget(DatasetWithMaskAndNoTarget):
 
 class DatasetWithTargetSpecifyTarget(DatasetWithMaskAndNoTarget):
 
-    def __init__(self, df: pd.DataFrame, targets: pd.DataFrame,
-                 transformer: sklearn.pipeline.Pipeline = None):
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        targets: pd.DataFrame,
+        transformer: sklearn.pipeline.Pipeline = None,
+    ):
         """Create a dataset for validation.
 
         Parameters
@@ -109,21 +113,23 @@ class DatasetWithTargetSpecifyTarget(DatasetWithMaskAndNoTarget):
             transformation pipeline to use, by default None
         """
         if not issubclass(type(df), pd.DataFrame):
-            raise ValueError(
-                f'please pass a pandas DataFrame, not: {type(df) = }')
+            raise ValueError(f"please pass a pandas DataFrame, not: {type(df) = }")
         self.mask_isna = targets.isna()
         self.columns = df.columns
         self.transformer = transformer
 
-        self.target = df.fillna(targets)  # not really necessary, without mask would not be needed
+        self.target = df.fillna(
+            targets
+        )  # not really necessary, without mask would not be needed
 
         if transformer:
-            if hasattr(transformer, 'transform'):
+            if hasattr(transformer, "transform"):
                 df = transformer.transform(df)
                 self.target = transformer.transform(self.target)
             else:
                 raise AttributeError(
-                    f'{type(transformer)} is not sklearn compatible, has no inverse_transform.')
+                    f"{type(transformer)} is not sklearn compatible, has no inverse_transform."
+                )
 
         self.data = df
         self.length_ = len(self.data)

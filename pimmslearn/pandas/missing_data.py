@@ -1,4 +1,5 @@
 """Functionality related to analyzing missing values in a pandas DataFrame."""
+
 from __future__ import annotations
 
 import math
@@ -28,7 +29,7 @@ def percent_non_missing(df: pd.DataFrame) -> float:
     return df.notna().sum().sum() / math.prod(df.shape)
 
 
-def list_files(folder='.') -> list[str]:
+def list_files(folder=".") -> list[str]:
     return [f.as_posix() for f in Path(folder).iterdir()]
 
 
@@ -41,17 +42,19 @@ def get_record(data: pd.DataFrame, columns_sample=False) -> dict:
     N_obs = data.notna().sum().sum()
     N_mis = N * M - N_obs
     missing = N_mis / (N_obs + N_mis)
-    record = dict(N=int(N),
-                  M=int(M),
-                  N_obs=int(N_obs),
-                  N_mis=int(N_mis),
-                  missing=float(missing), )
+    record = dict(
+        N=int(N),
+        M=int(M),
+        N_obs=int(N_obs),
+        N_mis=int(N_mis),
+        missing=float(missing),
+    )
     return record
 
 
-def decompose_NAs(data: pd.DataFrame,
-                  level: Union[int, str],
-                  label: int = 'summary') -> pd.DataFrame:
+def decompose_NAs(
+    data: pd.DataFrame, level: Union[int, str], label: int = "summary"
+) -> pd.DataFrame:
     """Decompose missing values by a level into real and indirectly imputed missing values.
     Real missing value have missing for all samples in a group. Indirectly imputed missing values
     are in MS-based proteomics data that would be imputed by the mean (or median) of the observed
@@ -86,16 +89,22 @@ def decompose_NAs(data: pd.DataFrame,
             M = len(_df)  # normally 2 or 3
             _real_mvs = _df.isna().all(axis=0).sum() * M
             real_mvs += _real_mvs
-            ii_mvs += (total_NAs - _real_mvs)
+            ii_mvs += total_NAs - _real_mvs
         else:
             ValueError("Something went wrong")
     assert data.isna().sum().sum() == real_mvs + ii_mvs
-    return pd.Series(
-        {'total_obs': data.notna().sum().sum(),
-         'total_MVs': data.isna().sum().sum(),
-         'real_MVs': real_mvs,
-         'indirectly_imputed_MVs': ii_mvs,
-         'real_MVs_ratio': real_mvs / data.isna().sum().sum(),
-         'indirectly_imputed_MVs_ratio': ii_mvs / data.isna().sum().sum(),
-         'total_MVs_ratio': data.isna().sum().sum() / data.size
-         }).to_frame(name=label).T.convert_dtypes()
+    return (
+        pd.Series(
+            {
+                "total_obs": data.notna().sum().sum(),
+                "total_MVs": data.isna().sum().sum(),
+                "real_MVs": real_mvs,
+                "indirectly_imputed_MVs": ii_mvs,
+                "real_MVs_ratio": real_mvs / data.isna().sum().sum(),
+                "indirectly_imputed_MVs_ratio": ii_mvs / data.isna().sum().sum(),
+                "total_MVs_ratio": data.isna().sum().sum() / data.size,
+            }
+        )
+        .to_frame(name=label)
+        .T.convert_dtypes()
+    )

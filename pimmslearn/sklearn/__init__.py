@@ -2,6 +2,7 @@
 
 Might be moved to a separate package in the future.
 """
+
 import logging
 
 from njab.sklearn import run_pca

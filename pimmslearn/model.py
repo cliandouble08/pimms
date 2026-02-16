@@ -16,10 +16,12 @@ def build_df_from_pred_batches(pred, scaler=None, index=None, columns=None):
     return pred
 
 
-def get_latent_space(model_method_call: callable,
-                     dl: torch.utils.data.DataLoader,
-                     dl_index: pd.Index,
-                     latent_tuple_pos: int = 0) -> pd.DataFrame:
+def get_latent_space(
+    model_method_call: callable,
+    dl: torch.utils.data.DataLoader,
+    dl_index: pd.Index,
+    latent_tuple_pos: int = 0,
+) -> pd.DataFrame:
     """Create a DataFrame of the latent space based on the model method call
     to be used (here: the model encoder or a latent space helper method)
 
@@ -51,8 +53,9 @@ def get_latent_space(model_method_call: callable,
         latent_space.append(res)
     M = res.shape[-1]
 
-    latent_space = build_df_from_pred_batches(latent_space,
-                                              index=dl_index,
-                                              columns=[f'latent dimension {i+1}'
-                                                       for i in range(M)])
+    latent_space = build_df_from_pred_batches(
+        latent_space,
+        index=dl_index,
+        columns=[f"latent dimension {i+1}" for i in range(M)],
+    )
     return latent_space

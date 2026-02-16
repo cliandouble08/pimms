@@ -1,5 +1,6 @@
 """Console script to create index.rst and conf.py for static website of
 the imputation comparison workflow."""
+
 import argparse
 import textwrap
 from collections import defaultdict
@@ -7,7 +8,7 @@ from pathlib import Path
 
 
 def split_nb_name(nb: str) -> list:
-    return nb.split('.')[0].split('_')
+    return nb.split(".")[0].split("_")
 
 
 INDEX_RST = textwrap.dedent("""\
@@ -116,59 +117,60 @@ CONF_PY = textwrap.dedent("""\
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Create index.rst and conf.py for static website '
-                    'of the imputation comparison workflow.')
-    parser.add_argument('--folder', '-f',
-                        type=str,
-                        help='Path to the folder',
-                        required=True)
+        description="Create index.rst and conf.py for static website "
+        "of the imputation comparison workflow."
+    )
+    parser.add_argument(
+        "--folder", "-f", type=str, help="Path to the folder", required=True
+    )
     args = parser.parse_args()
 
     folder_experiment = args.folder
 
     folder_experiment = Path(folder_experiment)
-    nbs = [_f.name for _f in folder_experiment.iterdir() if _f.suffix == '.ipynb']
+    nbs = [_f.name for _f in folder_experiment.iterdir() if _f.suffix == ".ipynb"]
     nbs
 
     groups = defaultdict(list)
     for nb in nbs:
-        _group = nb.split('_')[1]
+        _group = nb.split("_")[1]
         groups[_group].append(nb)
     groups = dict(groups)
     groups
 
     # Parse notebooks present in imputation workflow
 
-    nb_0 = ''
-    for nb in groups['0']:
+    nb_0 = ""
+    for nb in groups["0"]:
         nb_0 += " " * 4 + f"{nb}\n"
 
-    nb_1_PIMMS = ''
-    for nb in groups['1']:
-        if '_NAGuideR_' not in nb:
+    nb_1_PIMMS = ""
+    for nb in groups["1"]:
+        if "_NAGuideR_" not in nb:
             nb_1_PIMMS += " " * 4 + split_nb_name(nb)[-1] + f" <{nb}>\n"
 
-    nb_1_NAGuideR = ''
-    for nb in groups['1']:
-        if '_NAGuideR_' in nb:
+    nb_1_NAGuideR = ""
+    for nb in groups["1"]:
+        if "_NAGuideR_" in nb:
             _model = split_nb_name(nb)[-1]
             if _model.isupper():
                 nb_1_NAGuideR += " " * 4 + _model + f" <{nb}>\n"
             else:
-                nb_1_NAGuideR += " " * 4 + ' '.join(split_nb_name(nb[5:])) + f" <{nb}>\n"
+                nb_1_NAGuideR += (
+                    " " * 4 + " ".join(split_nb_name(nb[5:])) + f" <{nb}>\n"
+                )
 
-    nb_2 = ''
-    for nb in groups['2']:
-        nb_2 += " " * 4 + ' '.join(split_nb_name(nb[5:])) + f" <{nb}>\n"
+    nb_2 = ""
+    for nb in groups["2"]:
+        nb_2 += " " * 4 + " ".join(split_nb_name(nb[5:])) + f" <{nb}>\n"
 
-    index_rst = INDEX_RST.format(nb_0=nb_0,
-                                 nb_1_PIMMS=nb_1_PIMMS,
-                                 nb_1_NAGuideR=nb_1_NAGuideR,
-                                 nb_2=nb_2)
+    index_rst = INDEX_RST.format(
+        nb_0=nb_0, nb_1_PIMMS=nb_1_PIMMS, nb_1_NAGuideR=nb_1_NAGuideR, nb_2=nb_2
+    )
     # write to file and print further instructions
-    with open(folder_experiment / 'index.rst', 'w') as f:
+    with open(folder_experiment / "index.rst", "w") as f:
         f.write(index_rst)
-    with open(folder_experiment / 'conf.py', 'w') as f:
+    with open(folder_experiment / "conf.py", "w") as f:
         f.write(CONF_PY)
 
     msg = f"""\
@@ -206,9 +208,9 @@ def main():
     msg = textwrap.dedent(msg)
     print(msg)
 
-    with open(folder_experiment / 'README.md', 'w') as f:
+    with open(folder_experiment / "README.md", "w") as f:
         f.write(msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

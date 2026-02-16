@@ -26,10 +26,9 @@ def normalize_by_median(df_wide: pd.DataFrame, axis: int = 1) -> pd.DataFrame:
     return df_wide
 
 
-def normalize_sceptre(quant: pd.DataFrame,
-                      iter_thresh: float = 1.1,
-                      iter_max: int = 10,
-                      check_convex=True) -> pd.DataFrame:
+def normalize_sceptre(
+    quant: pd.DataFrame, iter_thresh: float = 1.1, iter_max: int = 10, check_convex=True
+) -> pd.DataFrame:
     """Normalize by sample and channel as in SCeptre paper. Code adapted to work
     with current pandas versions.
 
@@ -76,7 +75,9 @@ def normalize_sceptre(quant: pd.DataFrame,
             print(f"Median deviation: {median_dev:.2f}")
             break
         if i > 0 and check_convex and max_dev_old < max_dev:
-            raise ValueError("Non-convex behaviour. old max deviation smaller than current.")
+            raise ValueError(
+                "Non-convex behaviour. old max deviation smaller than current."
+            )
         print("performed {} iterations, max-dev: {:.2f}".format(i + 1, max_dev))
         max_dev_old = max_dev
     return quant

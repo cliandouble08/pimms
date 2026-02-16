@@ -10,14 +10,14 @@ import pandas as pd
 
 import pimmslearn.pandas
 
-PathsList = namedtuple('PathsList', ['files', 'folder'])
+PathsList = namedtuple("PathsList", ["files", "folder"])
 
 
 logger = logging.getLogger(__name__)
 logger.info(f"Calling from {__name__}")
 
 
-def search_files(path='.', query='.txt'):
+def search_files(path=".", query=".txt"):
     """Uses Pathlib to find relative to path files
     with the query text in their file names. Returns
     the path relative to the specified path.
@@ -42,27 +42,27 @@ def search_files(path='.', query='.txt'):
     return PathsList(files=files, folder=path)
 
 
-def search_subfolders(path='.', depth: int = 1, exclude_root: bool = False):
+def search_subfolders(path=".", depth: int = 1, exclude_root: bool = False):
     """Search subfolders relative to given path."""
     if not isinstance(depth, int) and depth > 0:
-        raise ValueError(
-            f"Please provide an strictly positive integer, not {depth}")
+        raise ValueError(f"Please provide an strictly positive integer, not {depth}")
     EXCLUDED = ["*ipynb_checkpoints*"]
 
     path = Path(path)
     directories = [path]
 
     def get_subfolders(path):
-        return [x for x in path.iterdir()
-                if x.is_dir() and not any(x.match(excl) for excl in EXCLUDED)
-                ]
+        return [
+            x
+            for x in path.iterdir()
+            if x.is_dir() and not any(x.match(excl) for excl in EXCLUDED)
+        ]
 
     directories_previous = directories.copy()
     while depth > 0:
         directories_new = list()
         for p in directories_previous:
-            directories_new.extend(
-                get_subfolders(p))
+            directories_new.extend(get_subfolders(p))
         directories.extend(directories_new)
         directories_previous = directories_new.copy()
         depth -= 1
@@ -72,30 +72,30 @@ def search_subfolders(path='.', depth: int = 1, exclude_root: bool = False):
     return directories
 
 
-def resolve_path(path: Union[str, Path], to: Union[str, Path] = '.') -> Path:
+def resolve_path(path: Union[str, Path], to: Union[str, Path] = ".") -> Path:
     """Resolve a path partly overlapping with to another path."""
     pwd = Path(to).absolute()
     pwd = [p for p in pwd.parts]
     ret = [p for p in Path(path).parts if p not in pwd]
-    return Path('/'.join(ret))
+    return Path("/".join(ret))
 
 
-def get_fname_from_keys(keys, folder='.', file_ext='.pkl', remove_duplicates=True):
+def get_fname_from_keys(keys, folder=".", file_ext=".pkl", remove_duplicates=True):
     if remove_duplicates:
         # https://stackoverflow.com/a/53657523/9684872
         keys = list(dict.fromkeys(keys))
     folder = Path(folder)
     folder.mkdir(exist_ok=True, parents=True)
-    fname_dataset = folder / '{}{}'.format(pimmslearn.pandas.replace_with(
-        ' '.join(keys), replace='- ', replace_with='_'), file_ext)
+    fname_dataset = folder / "{}{}".format(
+        pimmslearn.pandas.replace_with(" ".join(keys), replace="- ", replace_with="_"),
+        file_ext,
+    )
     return fname_dataset
 
 
-def dump_to_csv(df: pd.DataFrame,
-                folder: Path,
-                outfolder: Path,
-                parent_folder_fct=None
-                ) -> None:
+def dump_to_csv(
+    df: pd.DataFrame, folder: Path, outfolder: Path, parent_folder_fct=None
+) -> None:
     fname = f"{folder.stem}.csv"
     if parent_folder_fct is not None:
         outfolder = outfolder / parent_folder_fct(folder)
@@ -116,17 +116,17 @@ def dump_json(data_dict: dict, filename: Union[str, Path]):
     filename : Union[str, Path]
         Filepath to save dictionary as JSON.
     """
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         json.dump(obj=data_dict, fp=f, indent=4)
 
 
 def to_pickle(obj, fname):
-    with open(fname, 'wb') as f:
+    with open(fname, "wb") as f:
         pickle.dump(obj, f)
 
 
 def from_pickle(fname):
-    with open(fname, 'rb') as f:
+    with open(fname, "rb") as f:
         return pickle.load(f)
 
 
@@ -148,13 +148,17 @@ def load_json(fname: Union[str, Path]) -> dict:
     return d
 
 
-def parse_dict(input_dict: dict,
-               types: Tuple[Tuple] = ((PurePath, lambda p: str(PurePosixPath(p))),
-                                      (np.ndarray, lambda a: a.to_list()))):
+def parse_dict(
+    input_dict: dict,
+    types: Tuple[Tuple] = (
+        (PurePath, lambda p: str(PurePosixPath(p))),
+        (np.ndarray, lambda a: a.to_list()),
+    ),
+):
     """Transform a set of items (instances) to their string representation"""
     d = dict()
     for k, v in input_dict.items():
-        for (old_type, fct) in types:
+        for old_type, fct in types:
             if isinstance(v, old_type):
                 v = fct(v)
         d[k] = v
@@ -184,8 +188,9 @@ def extend_name(fname: Union[str, Path], extend_by: str, ext: str = None) -> Pat
     return fname
 
 
-def add_indices(array: np.array, original_df: pd.DataFrame,
-                index_only: bool = False) -> pd.DataFrame:
+def add_indices(
+    array: np.array, original_df: pd.DataFrame, index_only: bool = False
+) -> pd.DataFrame:
     """Add indices to array using provided origional DataFrame.
 
     Parameters
