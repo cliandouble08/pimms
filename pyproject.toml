@@ -53,7 +53,20 @@ docs = [
 [tool.flake8]
 max-line-length = 120
 aggressive = 2
-ignore = ["E501"]
+
+[tool.ruff]
+
+[tool.ruff.lint]
+# https://docs.astral.sh/ruff/tutorial/#rule-selection
+# 1. Enable flake8-bugbear (`B`) rules
+# 2. Enable pycodestyle (`E`) errors and (`W`) warnings
+# 3. Pyflakes (`F`) errors
+extend-select = ["E", "W", "F", "B"]
+# Ignore star imports used by fastai
+ignore = ["F403"]
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 120
 
 [build-system]
 build-backend = "setuptools.build_meta"
@@ -62,6 +75,9 @@ requires = ["setuptools>=64", "setuptools_scm>=8", "wheel"]
 [tool.setuptools_scm]
 # https://setuptools-scm.readthedocs.io/ 
 # used to pick up the version from the git tags or the latest commit.
+
+[tool.isort]
+profile = "black"
 
 [tool.setuptools.packages.find]
 include = ["pimmslearn"]

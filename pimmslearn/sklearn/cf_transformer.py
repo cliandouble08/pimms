@@ -1,4 +1,5 @@
 """Scikit-learn style interface for Collaborative Filtering model."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -21,6 +22,7 @@ from sklearn.utils.validation import check_is_fitted
 
 import pimmslearn
 import pimmslearn.models as models
+
 # patch plotting function
 from pimmslearn.models import collab, plot_loss
 
@@ -55,14 +57,15 @@ class CollaborativeFilteringTransformer(TransformerMixin, BaseEstimator):
 
     """
 
-    def __init__(self,
-                 target_column: str,
-                 sample_column: str,
-                 item_column: str,
-                 n_factors: int = 15,
-                 out_folder: str = '.',
-                 batch_size: int = 4096,
-                 ):
+    def __init__(
+        self,
+        target_column: str,
+        sample_column: str,
+        item_column: str,
+        n_factors: int = 15,
+        out_folder: str = ".",
+        batch_size: int = 4096,
+    ):
         self.target_column = target_column
         self.item_column = item_column
         self.sample_column = sample_column
@@ -71,10 +74,14 @@ class CollaborativeFilteringTransformer(TransformerMixin, BaseEstimator):
         self.out_folder.mkdir(exist_ok=True, parents=True)
         self.batch_size = batch_size
 
-    def fit(self, X: pd.Series, y: pd.Series = None,
-            epochs_max=20,
-            cuda: bool = True,
-            patience: int = 1):
+    def fit(
+        self,
+        X: pd.Series,
+        y: pd.Series = None,
+        epochs_max=20,
+        cuda: bool = True,
+        patience: int = 1,
+    ):
         """Fit the collaborative filtering model to the data provided in long-format.
 
         Parameters
@@ -105,8 +112,7 @@ class CollaborativeFilteringTransformer(TransformerMixin, BaseEstimator):
         """
         self.model_kwargs = dict(
             n_factors=self.n_factors,
-            y_range=(int(X.squeeze().min()),
-                     int(X.squeeze().max()) + 1)
+            y_range=(int(X.squeeze().min()), int(X.squeeze().max()) + 1),
         )
         if not cuda:
             default_device(use=False)  # set to cpu
@@ -124,36 +130,38 @@ class CollaborativeFilteringTransformer(TransformerMixin, BaseEstimator):
             splits = idx_splitter(X)
 
         self.cat_names = [self.sample_column, self.item_column]
-        self.to = TabularCollab(df=X,
-                                procs=[Categorify],
-                                cat_names=self.cat_names,
-                                y_names=[self.target_column],
-                                y_block=TransformBlock(),
-                                splits=splits)
-        self.dls = self.to.dataloaders(path='.', bs=self.batch_size)
+        self.to = TabularCollab(
+            df=X,
+            procs=[Categorify],
+            cat_names=self.cat_names,
+            y_names=[self.target_column],
+            y_block=TransformBlock(),
+            splits=splits,
+        )
+        self.dls = self.to.dataloaders(path=".", bs=self.batch_size)
 
         self.model = EmbeddingDotBias.from_classes(
-            classes=self.dls.classes,
-            **self.model_kwargs)
+            classes=self.dls.classes, **self.model_kwargs
+        )
 
         self.n_params = models.calc_net_weight_count(self.model)
-        self.learn = Learner(dls=self.dls,
-                             model=self.model,
-                             loss_func=MSELossFlat(),
-                             cbs=EarlyStoppingCallback(patience=patience) if y is not None else None,
-                             model_dir=self.out_folder)
+        self.learn = Learner(
+            dls=self.dls,
+            model=self.model,
+            loss_func=MSELossFlat(),
+            cbs=EarlyStoppingCallback(patience=patience) if y is not None else None,
+            model_dir=self.out_folder,
+        )
         if cuda:
             self.learn.model = self.learn.model.cuda()
 
         suggested_lr = self.learn.lr_find()
         print(f"{suggested_lr.valley = :.5f}")
 
-        self.learn.fit_one_cycle(epochs_max,
-
-                                 lr_max=suggested_lr.valley)
+        self.learn.fit_one_cycle(epochs_max, lr_max=suggested_lr.valley)
         self.plot_loss(y)
         self.epochs_trained_ = self.learn.epoch + 1
-        self.model_kwargs['suggested_inital_lr'] = suggested_lr.valley
+        self.model_kwargs["suggested_inital_lr"] = suggested_lr.valley
         # ? own method?
         # self.learn.save('collab_model')
 
@@ -174,7 +182,7 @@ class CollaborativeFilteringTransformer(TransformerMixin, BaseEstimator):
             The complete data with imputed values in long format
         """
         # Check is fit had been called
-        check_is_fitted(self, 'epochs_trained_')
+        check_is_fitted(self, "epochs_trained_")
 
         # ! Input validation
         # X = check_array(X, accept_sparse=True)
@@ -190,15 +198,16 @@ class CollaborativeFilteringTransformer(TransformerMixin, BaseEstimator):
     def plot_loss(self, y, figsize=(8, 4), save: bool = False):  # -> Axes:
         """Plot the training and validation loss of the model."""
         fig, ax = plt.subplots(figsize=figsize)
-        ax.set_title('CF loss: Reconstruction loss')
-        self.learn.recorder.plot_loss(skip_start=5, ax=ax,
-                                      with_valid=True if y is not None else False)
-        self.model_kwargs['batch_size'] = self.batch_size
+        ax.set_title("CF loss: Reconstruction loss")
+        self.learn.recorder.plot_loss(
+            skip_start=5, ax=ax, with_valid=True if y is not None else False
+        )
+        self.model_kwargs["batch_size"] = self.batch_size
         if save:
-            fig.savefig(self.out_folder / 'loss.png')
-            pimmslearn.savefig(fig, name='collab_training',
-                         folder=self.out_folder)
-            
-            pimmslearn.io.dump_json(self.model_kwargs,
-                              self.out_folder / 'model_params_{}.json'.format('CF'))
+            fig.savefig(self.out_folder / "loss.png")
+            pimmslearn.savefig(fig, name="collab_training", folder=self.out_folder)
+
+            pimmslearn.io.dump_json(
+                self.model_kwargs, self.out_folder / "model_params_{}.json".format("CF")
+            )
         return ax

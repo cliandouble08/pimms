@@ -9,7 +9,7 @@ from pimmslearn.io.datasplits import DataSplits
 logger = logging.getLogger(__name__)
 
 
-def feature_frequency(df_wide: pd.DataFrame, measure_name: str = 'freq') -> pd.Series:
+def feature_frequency(df_wide: pd.DataFrame, measure_name: str = "freq") -> pd.Series:
     """Generate frequency table based on singly indexed (both axes) DataFrame.
 
     Parameters
@@ -36,7 +36,9 @@ def feature_frequency(df_wide: pd.DataFrame, measure_name: str = 'freq') -> pd.S
     return freq_per_feat.squeeze()
 
 
-def frequency_by_index(df_long: pd.DataFrame, sample_index_to_drop: Union[str, int]) -> pd.Series:
+def frequency_by_index(
+    df_long: pd.DataFrame, sample_index_to_drop: Union[str, int]
+) -> pd.Series:
     """Generate frequency table based on an index level of a 2D multiindex.
 
     Parameters
@@ -59,9 +61,13 @@ def frequency_by_index(df_long: pd.DataFrame, sample_index_to_drop: Union[str, i
     return freq_per_feat.squeeze()
 
 
-def sample_data(series: pd.Series, sample_index_to_drop: Union[str, int],
-                frac=0.95, weights: pd.Series = None,
-                random_state=42) -> Tuple[pd.Series, pd.Series]:
+def sample_data(
+    series: pd.Series,
+    sample_index_to_drop: Union[str, int],
+    frac=0.95,
+    weights: pd.Series = None,
+    random_state=42,
+) -> Tuple[pd.Series, pd.Series]:
     """sample from doubly indexed series with sample index and feature index.
 
     Parameters
@@ -86,10 +92,11 @@ def sample_data(series: pd.Series, sample_index_to_drop: Union[str, int],
     """
     index_names = series.index.names
     new_column = index_names[sample_index_to_drop]
-    df = series.to_frame('intensity').reset_index(sample_index_to_drop)
+    df = series.to_frame("intensity").reset_index(sample_index_to_drop)
 
     df_sampled = df.groupby(by=new_column).sample(
-        frac=frac, weights=weights, random_state=random_state)
+        frac=frac, weights=weights, random_state=random_state
+    )
     series_sampled = df_sampled.reset_index().set_index(index_names).squeeze()
 
     idx_diff = series.index.difference(series_sampled.index)
@@ -97,11 +104,12 @@ def sample_data(series: pd.Series, sample_index_to_drop: Union[str, int],
     return series_sampled, series_not_sampled
 
 
-def sample_mnar_mcar(df_long: pd.DataFrame,
-                     frac_non_train: float,
-                     frac_mnar: float,
-                     random_state: int = 42
-                     ) -> Tuple[DataSplits, pd.Series, pd.Series, pd.Series]:
+def sample_mnar_mcar(
+    df_long: pd.DataFrame,
+    frac_non_train: float,
+    frac_mnar: float,
+    random_state: int = 42,
+) -> Tuple[DataSplits, pd.Series, pd.Series, pd.Series]:
     """Sampling of data for MNAR/MCAR simulation. The function samples from the df_long
     DataFrame and returns the training, validation and test splits in dhte DataSplits object.
 
@@ -148,32 +156,22 @@ def sample_mnar_mcar(df_long: pd.DataFrame,
     N_MNAR = int(frac_non_train * frac_mnar * N)
     fake_na_mnar = df_long.loc[mask]
     if len(fake_na_mnar) > N_MNAR:
-        fake_na_mnar = fake_na_mnar.sample(N_MNAR,
-                                           random_state=random_state)
+        fake_na_mnar = fake_na_mnar.sample(N_MNAR, random_state=random_state)
     # select MCAR from remaining intensities
     splits = DataSplits(is_wide_format=False)
-    splits.train_X = df_long.loc[
-        df_long.index.difference(
-            fake_na_mnar.index)
-    ]
+    splits.train_X = df_long.loc[df_long.index.difference(fake_na_mnar.index)]
     logger.info(f"{len(fake_na_mnar) = :,d}")
     N_MCAR = int(N * (1 - frac_mnar) * frac_non_train)
-    fake_na_mcar = splits.train_X.sample(N_MCAR,
-                                         random_state=random_state)
+    fake_na_mcar = splits.train_X.sample(N_MCAR, random_state=random_state)
     logger.info(f"{len(splits.train_X) = :,d}")
 
     fake_na = pd.concat([fake_na_mcar, fake_na_mnar]).squeeze()
     logger.info(f"{len(fake_na) = :,d}")
 
     logger.info(f"{len(fake_na_mcar) = :,d}")
-    splits.train_X = (splits
-                      .train_X
-                      .loc[splits
-                           .train_X
-                           .index
-                           .difference(
-                               fake_na_mcar.index)]
-                      ).squeeze()
+    splits.train_X = (
+        splits.train_X.loc[splits.train_X.index.difference(fake_na_mcar.index)]
+    ).squeeze()
     # Distribute MNAR and MCAR in validation and test set
     splits.val_y = fake_na.sample(frac=0.5, random_state=random_state)
     splits.test_y = fake_na.loc[fake_na.index.difference(splits.val_y.index)]
@@ -182,8 +180,9 @@ def sample_mnar_mcar(df_long: pd.DataFrame,
     return splits, thresholds, fake_na_mcar, fake_na_mnar
 
 
-def get_thresholds(df_long: pd.DataFrame, frac_non_train: float,
-                   random_state: int) -> pd.Series:
+def get_thresholds(
+    df_long: pd.DataFrame, frac_non_train: float, random_state: int
+) -> pd.Series:
     """Get thresholds for MNAR/MCAR sampling. Thresholds are sampled from a normal
     distrubiton with a mean of the quantile of the simulated missing data.
 
@@ -218,30 +217,22 @@ def get_thresholds(df_long: pd.DataFrame, frac_non_train: float,
 def check_split_integrity(splits: DataSplits) -> DataSplits:
     """Check if IDs in are only in validation or test data for rare cases.
     Returns the corrected splits."""
-    diff = (splits
-            .val_y
-            .index
-            .levels[-1]
-            .difference(splits
-                        .train_X
-                        .index
-                        .levels[-1]
-                        ).to_list())
+    diff = (
+        splits.val_y.index.levels[-1]
+        .difference(splits.train_X.index.levels[-1])
+        .to_list()
+    )
     if diff:
         logger.warning(f"Remove from val: {diff.to_list()}")
         to_remove = splits.val_y.loc[pd.IndexSlice[:, diff]]
         splits.train_X = pd.concat([splits.train_X, to_remove])
         splits.val_y = splits.val_y.drop(to_remove.index)
 
-    diff = (splits
-            .test_y
-            .index
-            .levels[-1]
-            .difference(splits
-                        .train_X
-                        .index
-                        .levels[-1]
-                        ).to_list())
+    diff = (
+        splits.test_y.index.levels[-1]
+        .difference(splits.train_X.index.levels[-1])
+        .to_list()
+    )
     if diff:
         logger.warning(f"Remove from test: {diff.to_list()}")
         to_remove = splits.test_y.loc[pd.IndexSlice[:, diff]]

@@ -1,14 +1,15 @@
+import logging
 from pathlib import Path
 from pprint import pformat
+
 import yaml
 
 import pimmslearn.io
 
-import logging
 logger = logging.getLogger()
 
 
-class Config():
+class Config:
     """Config class with a setter enforcing that config entries cannot
     be overwritten.
 
@@ -21,8 +22,7 @@ class Config():
     def __setattr__(self, entry, value):
         """Set if attribute not in instance."""
         if hasattr(self, entry) and getattr(self, entry) != value:
-            raise AttributeError(
-                f'{entry} already set to {getattr(self, entry)}')
+            raise AttributeError(f"{entry} already set to {getattr(self, entry)}")
         super().__setattr__(entry, value)
 
     def __repr__(self):
@@ -36,12 +36,13 @@ class Config():
         if fname is None:
             try:
                 fname = self.out_folder
-                fname = Path(fname) / 'model_config.yml'
-            except AttributeError:
+                fname = Path(fname) / "model_config.yml"
+            except AttributeError as e:
                 raise AttributeError(
-                    'Specify fname or set "out_folder" attribute.')
+                    'Specify fname or set "out_folder" attribute.'
+                ) from e
         d = pimmslearn.io.parse_dict(input_dict=self.__dict__)
-        with open(fname, 'w') as f:
+        with open(fname, "w") as f:
             yaml.dump(d, f)
         logger.info(f"Dumped config to: {fname}")
 
@@ -70,7 +71,7 @@ class Config():
 
 
 def get_params(args: dict.keys, globals, remove=True) -> dict:
-    params = {k: v for k, v in globals.items() if k not in args and k[0] != '_'}
+    params = {k: v for k, v in globals.items() if k not in args and k[0] != "_"}
     if not remove:
         return params
     remove_keys_from_globals(params.keys(), globals=globals)
@@ -86,7 +87,7 @@ def remove_keys_from_globals(keys: dict.keys, globals: dict):
             logger.warning(f"Key not found in globals(): {k}")
 
 
-def add_default_paths(cfg: Config, folder_data='', out_root=None):
+def add_default_paths(cfg: Config, folder_data="", out_root=None):
     """Add default paths to config."""
     if out_root:
         cfg.out_folder = Path(out_root)
@@ -96,26 +97,29 @@ def add_default_paths(cfg: Config, folder_data='', out_root=None):
     if folder_data:
         cfg.data = Path(folder_data)
     else:
-        cfg.data = cfg.folder_experiment / 'data'
+        cfg.data = cfg.folder_experiment / "data"
         cfg.data.mkdir(exist_ok=True, parents=True)
     assert cfg.data.exists(), f"Directory not found: {cfg.data}"
     del folder_data
-    cfg.out_figures = cfg.folder_experiment / 'figures'
+    cfg.out_figures = cfg.folder_experiment / "figures"
     cfg.out_figures.mkdir(exist_ok=True)
     cfg.out_metrics = cfg.folder_experiment
     cfg.out_metrics.mkdir(exist_ok=True)
     cfg.out_models = cfg.folder_experiment
     cfg.out_models.mkdir(exist_ok=True)
-    cfg.out_preds = cfg.folder_experiment / 'preds'
+    cfg.out_preds = cfg.folder_experiment / "preds"
     cfg.out_preds.mkdir(exist_ok=True)
     return cfg
 
 
 def args_from_dict(args: dict) -> Config:
-    assert 'folder_experiment' in args, f'Specify "folder_experiment" in {args}.'
-    args['folder_experiment'] = Path(args['folder_experiment'])
+    assert "folder_experiment" in args, f'Specify "folder_experiment" in {args}.'
+    args["folder_experiment"] = Path(args["folder_experiment"])
     args = Config().from_dict(args)
     args.folder_experiment.mkdir(exist_ok=True, parents=True)
-    add_default_paths(args, folder_data=args.__dict__.get('folder_data', ''),
-                      out_root=args.__dict__.get('out_root', None))
+    add_default_paths(
+        args,
+        folder_data=args.__dict__.get("folder_data", ""),
+        out_root=args.__dict__.get("out_root", None),
+    )
     return args

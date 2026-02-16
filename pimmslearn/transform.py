@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 # ! general transform and inverse_transform needs to move somewhere else
 
+
 def transform(self, X, **kwargs):
     res = super(self.__class__, self).transform(X, **kwargs)
     if isinstance(X, pd.DataFrame):
@@ -39,16 +40,22 @@ msg_return_docstring = """
 def make_pandas_compatible(cls):
     """Patch transform and inverse_transform."""
     # ? could become factory function, build args dictionary
-    _fcts = ['transform', 'inverse_transform']
+    _fcts = ["transform", "inverse_transform"]
     for _fct in _fcts:
         if not hasattr(cls, _fct):
             raise ValueError(f"no {_fct} method for {cls.__name__}")
-    new_class = type(cls.__name__, (cls,), dict(
-        transform=transform, inverse_transform=inverse_transform))
+    new_class = type(
+        cls.__name__,
+        (cls,),
+        dict(transform=transform, inverse_transform=inverse_transform),
+    )
 
     new_class.transform.__doc__ = cls.transform.__doc__ + msg_return_docstring
-    new_class.inverse_transform.__doc__ = cls.inverse_transform.__doc__ + msg_return_docstring
+    new_class.inverse_transform.__doc__ = (
+        cls.inverse_transform.__doc__ + msg_return_docstring
+    )
     return new_class
+
 
 # ? Can this be a MixIn class?
 # # this could be a class method
@@ -64,11 +71,15 @@ def make_pandas_compatible(cls):
 MinMaxScaler = make_pandas_compatible(preprocessing.MinMaxScaler)
 
 
-class VaepPipeline():
+class VaepPipeline:
     """Custom Pipeline combining a pandas.DataFrame and a sklearn.pipeline.Pipleine."""
 
-    def __init__(self, df_train: pd.DataFrame, encode: sklearn.pipeline.Pipeline,
-                 decode: List[str] = None):
+    def __init__(
+        self,
+        df_train: pd.DataFrame,
+        encode: sklearn.pipeline.Pipeline,
+        decode: List[str] = None,
+    ):
         """[summary]
 
         Parameters
@@ -88,9 +99,7 @@ class VaepPipeline():
         if decode:
             self.decode = list()
             for d in decode:
-                self.decode.append(
-                    (d, self.encode.named_steps[d])
-                )
+                self.decode.append((d, self.encode.named_steps[d]))
 
             self.decode = sklearn.pipeline.Pipeline(self.decode)
         else:

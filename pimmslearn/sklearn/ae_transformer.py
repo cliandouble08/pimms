@@ -1,4 +1,5 @@
 """Scikit-learn style interface for Denoising and Variational Autoencoder model."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -19,6 +20,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.utils.validation import check_is_fitted
 
 import pimmslearn.models as models
+
 # patch plotting function
 from pimmslearn.models import ae, plot_loss
 
@@ -26,10 +28,8 @@ learner.Recorder.plot_loss = plot_loss
 
 
 default_pipeline = sklearn.pipeline.Pipeline(
-    [
-        ('normalize', StandardScaler()),
-        ('impute', SimpleImputer(add_indicator=False))
-    ])
+    [("normalize", StandardScaler()), ("impute", SimpleImputer(add_indicator=False))]
+)
 
 
 class AETransformer(TransformerMixin, BaseEstimator):
@@ -58,38 +58,41 @@ class AETransformer(TransformerMixin, BaseEstimator):
 
     """
 
-    def __init__(self,
-                 hidden_layers: list[int],
-                 latent_dim: int = 15,
-                 out_folder: str = '.',
-                 model='VAE',
-                 #  y_range:Optional[tuple[int]]=None,
-                 batch_size: int = 64,
-                 ):
+    def __init__(
+        self,
+        hidden_layers: list[int],
+        latent_dim: int = 15,
+        out_folder: str = ".",
+        model="VAE",
+        #  y_range:Optional[tuple[int]]=None,
+        batch_size: int = 64,
+    ):
         self.hidden_layers = hidden_layers
         self.latent_dim = latent_dim
         self.batch_size = batch_size
         self.out_folder = Path(out_folder)
         self.out_folder.mkdir(exist_ok=True, parents=True)
 
-        if model == 'VAE':
+        if model == "VAE":
             self.model = models.vae.VAE
             self.cbs = [ae.ModelAdapterVAE()]
             self.loss_fct = models.vae.loss_fct
-        elif model == 'DAE':
+        elif model == "DAE":
             self.model = ae.Autoencoder
             self.cbs = [ae.ModelAdapter(p=0.2)]
-            self.loss_fct = MSELossFlat(reduction='sum')
+            self.loss_fct = MSELossFlat(reduction="sum")
         else:
             raise ValueError(f'Unknown model {model}, choose either "VAE" or "DAE"')
         self.model_name = model
 
-    def fit(self,
-            X: pd.DataFrame,
-            y: pd.DataFrame = None,
-            epochs_max: int = 100,
-            cuda: bool = True,
-            patience: Optional[int] = None):
+    def fit(
+        self,
+        X: pd.DataFrame,
+        y: pd.DataFrame = None,
+        epochs_max: int = 100,
+        cuda: bool = True,
+        patience: Optional[int] = None,
+    ):
         """Fit the model to the data.
 
         Parameters
@@ -115,13 +118,16 @@ class AETransformer(TransformerMixin, BaseEstimator):
             train_df=X,
             val_df=y,
             model=self.model,
-            model_kwargs=dict(n_features=X.shape[-1],
-                              n_neurons=self.hidden_layers,
-                              last_decoder_activation=None,
-                              dim_latent=self.latent_dim),
+            model_kwargs=dict(
+                n_features=X.shape[-1],
+                n_neurons=self.hidden_layers,
+                last_decoder_activation=None,
+                dim_latent=self.latent_dim,
+            ),
             transform=default_pipeline,
-            decode=['normalize'],
-            bs=self.batch_size)
+            decode=["normalize"],
+            bs=self.batch_size,
+        )
 
         self.n_params = self.analysis.n_params_ae
         if cuda:
@@ -130,14 +136,15 @@ class AETransformer(TransformerMixin, BaseEstimator):
         cbs = self.cbs
         if patience is not None:
             cbs = [*self.cbs, EarlyStoppingCallback(patience=patience)]
-        self.analysis.learn = Learner(dls=self.analysis.dls,
-                                      model=self.analysis.model,
-                                      loss_func=self.loss_fct,
-                                      cbs=cbs
-                                      )
+        self.analysis.learn = Learner(
+            dls=self.analysis.dls,
+            model=self.analysis.model,
+            loss_func=self.loss_fct,
+            cbs=cbs,
+        )
 
         suggested_lr = self.analysis.learn.lr_find()
-        self.analysis.params['suggested_inital_lr'] = suggested_lr.valley
+        self.analysis.params["suggested_inital_lr"] = suggested_lr.valley
         self.analysis.learn.fit_one_cycle(epochs_max, lr_max=suggested_lr.valley)
         self.epochs_trained_ = self.analysis.learn.epoch + 1
         N_train_notna = X.notna().sum().sum()
@@ -145,9 +152,11 @@ class AETransformer(TransformerMixin, BaseEstimator):
         if y is not None:
             N_val_notna = y.notna().sum().sum()
         self.fig_loss_ = models.plot_training_losses(
-            self.analysis.learn, self.model_name,
+            self.analysis.learn,
+            self.model_name,
             folder=self.out_folder,
-            norm_factors=[N_train_notna, N_val_notna])
+            norm_factors=[N_train_notna, N_val_notna],
+        )
         return self
 
     def transform(self, X):
@@ -165,7 +174,7 @@ class AETransformer(TransformerMixin, BaseEstimator):
             Return the imputed DataFrame using the model.
         """
         # Check is fit had been called
-        check_is_fitted(self, 'epochs_trained_')
+        check_is_fitted(self, "epochs_trained_")
 
         self.analysis.model.eval()
 
@@ -173,5 +182,6 @@ class AETransformer(TransformerMixin, BaseEstimator):
             df=X,
             learn=self.analysis.learn,
             position_pred_tuple=0,
-            transformer=self.analysis.transform)
+            transformer=self.analysis.transform,
+        )
         return X.fillna(pred)

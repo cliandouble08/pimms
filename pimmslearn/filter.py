@@ -5,11 +5,10 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def select_features(df: pd.DataFrame,
-                    feat_prevalence: float = .2,
-                    axis: int = 0) -> pd.DataFrame:
-    """Select features or samples with a minimum prevalence.
-    """
+def select_features(
+    df: pd.DataFrame, feat_prevalence: float = 0.2, axis: int = 0
+) -> pd.DataFrame:
+    """Select features or samples with a minimum prevalence."""
     N = df.shape[axis]
     minimum_freq = N * feat_prevalence
     freq = df.notna().sum(axis=axis)

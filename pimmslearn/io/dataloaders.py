@@ -1,4 +1,3 @@
-
 import pandas
 import pandas as pd
 from fastai.data.all import *
@@ -11,11 +10,13 @@ from pimmslearn.io.datasets import DatasetWithTarget
 from pimmslearn.transform import VaepPipeline
 
 
-def get_dls(train_X: pandas.DataFrame,
-            valid_X: pandas.DataFrame,
-            transformer: VaepPipeline,
-            bs: int = 64,
-            num_workers=0) -> DataLoaders:
+def get_dls(
+    train_X: pandas.DataFrame,
+    valid_X: pandas.DataFrame,
+    transformer: VaepPipeline,
+    bs: int = 64,
+    num_workers=0,
+) -> DataLoaders:
     """Create training and validation dataloaders
 
     Parameters
@@ -55,12 +56,11 @@ def get_dls(train_X: pandas.DataFrame,
                                   decode=['normalize'])
     dls = get_dls(train_X, val_X, transforms, bs=4)
     """
-    train_ds = datasets.DatasetWithTarget(df=train_X,
-                                          transformer=transformer)
+    train_ds = datasets.DatasetWithTarget(df=train_X, transformer=transformer)
     if valid_X is not None:
-        valid_ds = datasets.DatasetWithTargetSpecifyTarget(df=train_X,
-                                                           targets=valid_X,
-                                                           transformer=transformer)
+        valid_ds = datasets.DatasetWithTargetSpecifyTarget(
+            df=train_X, targets=valid_X, transformer=transformer
+        )
     else:
         # empty dataset will be ignored by fastai in training loops
         valid_ds = datasets.DatasetWithTarget(df=pd.DataFrame())
@@ -70,16 +70,19 @@ def get_dls(train_X: pandas.DataFrame,
     if (len(train_X) % bs) == 1:
         # Batch-Normalization does not work with batches of size one
         drop_last = True
-    return DataLoaders.from_dsets(train_ds, valid_ds, bs=bs, drop_last=drop_last,
-                                  num_workers=num_workers)
+    return DataLoaders.from_dsets(
+        train_ds, valid_ds, bs=bs, drop_last=drop_last, num_workers=num_workers
+    )
 
 
 # dls.test_dl
 # needs to be part of setup procedure of a class
-def get_test_dl(df: pandas.DataFrame,
-                transformer: VaepPipeline,
-                dataset: Dataset = DatasetWithTarget,
-                bs: int = 64):
+def get_test_dl(
+    df: pandas.DataFrame,
+    transformer: VaepPipeline,
+    dataset: Dataset = DatasetWithTarget,
+    bs: int = 64,
+):
     """[summary]
 
     Parameters
