@@ -6,11 +6,14 @@ from typing import List
 import pandas as pd
 
 
-def load_predictions(pred_files: List, shared_columns=["observed"]):
+def load_predictions(pred_files: List, shared_columns=("observed",)):
 
     pred_files = iter(pred_files)
     fname = next(pred_files)
     pred = pd.read_csv(fname, index_col=[0, 1])
+
+    # cast to list
+    shared_columns = list(shared_columns)
 
     for fname in pred_files:
         _pred_file = pd.read_csv(fname, index_col=[0, 1])

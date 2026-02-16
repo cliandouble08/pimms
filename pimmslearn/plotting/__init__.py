@@ -110,7 +110,7 @@ def select_dates(date_series: pd.Series, max_ticks=30) -> np.array:
     if offset > 1:
         return xticks[::offset]
     else:
-        xticks
+        return xticks
 
 
 def make_large_descriptors(size="xx-large"):

@@ -129,14 +129,12 @@ def main():
 
     folder_experiment = Path(folder_experiment)
     nbs = [_f.name for _f in folder_experiment.iterdir() if _f.suffix == ".ipynb"]
-    nbs
 
     groups = defaultdict(list)
     for nb in nbs:
         _group = nb.split("_")[1]
         groups[_group].append(nb)
     groups = dict(groups)
-    groups
 
     # Parse notebooks present in imputation workflow
 

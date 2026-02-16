@@ -68,14 +68,12 @@ def main():
         for _f in subfolder_comparison.glob("**/*.ipynb")
         if _f.is_file()
     ]
-    nbs
 
     groups = defaultdict(list)
     for nb in nbs:
         _group = nb.name.split("_")[1]
         groups[_group].append(nb)
     groups = dict(groups)
-    groups
 
     # Parse notebooks present in imputation workflow
 
