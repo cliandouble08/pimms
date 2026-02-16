@@ -1,9 +1,9 @@
 """Custom logging setup for notebooks."""
 
-from pathlib import Path
-from datetime import datetime
 import logging
 import sys
+from datetime import datetime
+from pathlib import Path
 
 LOG_FOLDER = Path("logs")
 LOG_FOLDER.mkdir(exist_ok=True)

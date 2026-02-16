@@ -63,5 +63,8 @@ requires = ["setuptools>=64", "setuptools_scm>=8", "wheel"]
 # https://setuptools-scm.readthedocs.io/ 
 # used to pick up the version from the git tags or the latest commit.
 
+[tool.isort]
+profile = "black"
+
 [tool.setuptools.packages.find]
 include = ["pimmslearn"]

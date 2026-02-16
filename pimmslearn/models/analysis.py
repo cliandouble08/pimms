@@ -1,8 +1,8 @@
-import pimmslearn.transform
-import torch.nn
 import fastai.data.core
 import fastai.learner
+import torch.nn
 
+import pimmslearn.transform
 from pimmslearn.analyzers import Analysis
 
 

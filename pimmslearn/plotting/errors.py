@@ -9,7 +9,6 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from seaborn.categorical import EstimateAggregator
 
-
 import pimmslearn.pandas.calc_errors
 
 

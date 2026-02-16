@@ -1,10 +1,10 @@
+import logging
 from pathlib import Path
 from pprint import pformat
+
 import yaml
 
 import pimmslearn.io
-
-import logging
 
 logger = logging.getLogger()
 

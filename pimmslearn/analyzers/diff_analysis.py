@@ -1,6 +1,7 @@
 from __future__ import annotations
-from collections import namedtuple
+
 import logging
+from collections import namedtuple
 
 import pandas as pd
 

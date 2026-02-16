@@ -1,11 +1,13 @@
 """Collects metrics and config files from the experiment directory structure."""
 
-from functools import partial, update_wrapper
-import logging
-from pathlib import Path
 import json
+import logging
+from functools import partial, update_wrapper
+from pathlib import Path
+from typing import Callable, Iterable
+
 import yaml
-from typing import Iterable, Callable
+
 import pimmslearn.pandas
 
 logger = logging.getLogger(__name__)
