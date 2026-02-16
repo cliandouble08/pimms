@@ -115,6 +115,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install prerequisites (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install tcltk
+
       - name: install pimms
         run: pip install .
 
