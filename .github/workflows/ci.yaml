@@ -20,6 +20,8 @@ jobs:
         with:
           src: pimmslearn
       - uses: isort/isort-action@v1
+        with:
+          sortPaths: pimmslearn
   lint:
     name: Lint with ruff
     runs-on: ubuntu-latest
