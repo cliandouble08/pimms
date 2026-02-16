@@ -32,13 +32,13 @@ YYVLNALK,2,492.28166,3521,147430000.0,58.687
 
 def test_select_max_by():
     index_columns = ["Sequence", "Charge"]
-    selection_column = 'Score'
+    selection_column = "Score"
 
     df = pd.read_csv(io.StringIO(data))
 
-    actual = select_max_by(df,
-                           grouping_columns=index_columns,
-                           selection_column=selection_column).set_index(index_columns)
+    actual = select_max_by(
+        df, grouping_columns=index_columns, selection_column=selection_column
+    ).set_index(index_columns)
 
     desired = pd.read_csv(io.StringIO(expected), index_col=index_columns)
     assert desired.equals(actual)

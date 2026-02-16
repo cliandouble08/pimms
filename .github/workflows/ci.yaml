@@ -17,6 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: psf/black@stable
+        with:
+          src: pimmslearn
       - uses: isort/isort-action@v1
   lint:
     name: Lint with ruff

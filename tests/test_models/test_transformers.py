@@ -1,4 +1,5 @@
 """Test scikit-learn transformers provided by PIMMS."""
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -7,11 +8,11 @@ from pimmslearn.sklearn.ae_transformer import AETransformer
 from pimmslearn.sklearn.cf_transformer import CollaborativeFilteringTransformer
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def load_pkg_sample_data():
-    test_data = 'project/data/dev_datasets/HeLa_6070/protein_groups_wide_N50_M227.csv'
-    index_name = 'Sample ID'
-    column_name = 'protein group'
+    test_data = "project/data/dev_datasets/HeLa_6070/protein_groups_wide_N50_M227.csv"
+    index_name = "Sample ID"
+    column_name = "protein group"
     # read data, name index and columns
     df = pd.read_csv(test_data, index_col=0)
     df = np.log2(df + 1)
@@ -21,13 +22,14 @@ def load_pkg_sample_data():
 
 
 def test_CollaborativeFilteringTransformer(load_pkg_sample_data):
-    index_name = 'Sample ID'
-    column_name = 'protein group'
-    value_name = 'intensity'
+    index_name = "Sample ID"
+    column_name = "protein group"
+    value_name = "intensity"
     model = CollaborativeFilteringTransformer(
         target_column=value_name,
         sample_column=index_name,
-        item_column=column_name,)
+        item_column=column_name,
+    )
     series = load_pkg_sample_data.stack()
     series.name = value_name  # ! important
     # run for 2 epochs
@@ -36,19 +38,22 @@ def test_CollaborativeFilteringTransformer(load_pkg_sample_data):
     assert df_imputed.isna().sum().sum() == 0
 
 
-@pytest.mark.parametrize("model", ['DAE', 'VAE'])
+@pytest.mark.parametrize("model", ["DAE", "VAE"])
 def test_AETransformer(model, load_pkg_sample_data):
     df = load_pkg_sample_data
     model = AETransformer(
         model=model,
-        hidden_layers=[512,],
+        hidden_layers=[
+            512,
+        ],
         latent_dim=50,
-        out_folder='runs/scikit_interface',
+        out_folder="runs/scikit_interface",
         batch_size=10,
     )
-    model.fit(df,
-              cuda=False,
-              epochs_max=2,
-              )
+    model.fit(
+        df,
+        cuda=False,
+        epochs_max=2,
+    )
     df_imputed = model.transform(df)
     assert df_imputed.isna().sum().sum() == 0

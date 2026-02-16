@@ -1,7 +1,6 @@
 import pimmslearn
 from pimmslearn.models import ae
 
-
 expected_repr = """Autoencoder(
   (encoder): Sequential(
     (0): Linear(in_features=100, out_features=30, bias=True)

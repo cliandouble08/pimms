@@ -9,13 +9,15 @@ from pimmslearn.models import collab
 N, M = 10, 4
 
 X = np.random.rand(N, M)
-df = pd.DataFrame(X,
-                  index=[f'sample_{i}' for i in range(N)],
-                  columns=(f'feat_{i}' for i in range(M)))
+df = pd.DataFrame(
+    X, index=[f"sample_{i}" for i in range(N)], columns=(f"feat_{i}" for i in range(M))
+)
 
-data = {'train_X': df.iloc[:int(N * 0.6)],
-        'val_y': df.iloc[int(N * 0.6):int(N * 0.8)],
-        'test_y': df.iloc[int(N * 0.8):]}
+data = {
+    "train_X": df.iloc[: int(N * 0.6)],
+    "val_y": df.iloc[int(N * 0.6) : int(N * 0.8)],
+    "test_y": df.iloc[int(N * 0.8) :],
+}
 
 data = DataSplits(**data, is_wide_format=True)
 assert data._is_wide

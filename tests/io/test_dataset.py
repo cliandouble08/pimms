@@ -19,10 +19,11 @@ assert (~np.isnan(data_w_na) == mask).all()
 
 def create_DataFrame():
     data = np.arange(100).reshape(-1, 5)
-    data = pd.DataFrame(data,
-                        index=(f'row_{i:02}' for i in range(data.shape[0])),
-                        columns=(f'feat_{i:02}' for i in range(data.shape[1]))
-                        )
+    data = pd.DataFrame(
+        data,
+        index=(f"row_{i:02}" for i in range(data.shape[0])),
+        columns=(f"feat_{i:02}" for i in range(data.shape[1])),
+    )
     return data
 
 
@@ -306,16 +307,20 @@ def test_DatasetWithTargetSpecifyTarget_floats():
     ds = datasets.DatasetWithTargetSpecifyTarget(df=data, targets=targets)
 
     torch.testing.assert_close(
-        ds[-1][0], torch.tensor([0., 1., 1., 1.,
-                                 1., 1., 1.], dtype=torch.float32)
+        ds[-1][0],
+        torch.tensor([0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], dtype=torch.float32),
     )
     torch.testing.assert_close(
         ds[-1][1],
-        torch.tensor([nan, 24.5716, nan, nan,
-                      nan, 23.6247, 22.4436], dtype=torch.float32),
-        equal_nan=True)
+        torch.tensor(
+            [nan, 24.5716, nan, nan, nan, 23.6247, 22.4436], dtype=torch.float32
+        ),
+        equal_nan=True,
+    )
     torch.testing.assert_close(
         ds[-1][2],
-        torch.tensor([23.2892, 24.5716, nan,
-                      nan, nan, 23.6247, 22.4436], dtype=torch.float32),
-        equal_nan=True)
+        torch.tensor(
+            [23.2892, 24.5716, nan, nan, nan, 23.6247, 22.4436], dtype=torch.float32
+        ),
+        equal_nan=True,
+    )

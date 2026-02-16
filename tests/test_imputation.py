@@ -13,6 +13,7 @@ data.drop('index', axis=1, inplace=True)
 data.apply(numpy.random.shuffle, axis=1)
 data.to_csv('test_data.csv')
 """
+
 from pathlib import Path
 
 import numpy as np
@@ -27,16 +28,17 @@ def example_data():
     """
     Fixture to load example data from a csv file for testing.
     """
-    example_data_path = Path(__file__).resolve().parent / 'test_data.csv'
-    return pd.read_csv(example_data_path, index_col='id')
+    example_data_path = Path(__file__).resolve().parent / "test_data.csv"
+    return pd.read_csv(example_data_path, index_col="id")
 
 
-@pytest.mark.parametrize('axis', [0, 1])
+@pytest.mark.parametrize("axis", [0, 1])
 def test_impute_shifted_normal(example_data, axis):
     mean_shift = 1.8
     # remove zeros as these lead to -inf
-    example_data = np.log2(example_data.replace({0.0: np.nan})
-                           ).dropna(thresh=10, axis=1 - axis)
+    example_data = np.log2(example_data.replace({0.0: np.nan})).dropna(
+        thresh=10, axis=1 - axis
+    )
     N, M = example_data.shape
     mask_observed = example_data.notna()
     imputed = impute_shifted_normal(example_data, axis=axis, mean_shift=mean_shift)

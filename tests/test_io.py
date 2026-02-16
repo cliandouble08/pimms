@@ -4,9 +4,9 @@ import pimmslearn.io
 
 
 def test_relative_to():
-    fpath = Path('project/runs/experiment_name/run')
-    pwd = 'project/runs/'  # per defaut '.' (the current working directory)
-    expected = Path('experiment_name/run')
+    fpath = Path("project/runs/experiment_name/run")
+    pwd = "project/runs/"  # per defaut '.' (the current working directory)
+    expected = Path("experiment_name/run")
     acutal = pimmslearn.io.resolve_path(fpath, pwd)
     assert expected == acutal
 
