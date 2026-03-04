@@ -27,7 +27,7 @@ dependencies = [
   "matplotlib",
   "plotly",             # not used in library, but workflow
   "omegaconf",
-  "pingouin",
+  "pingouin<0.6.0",
   "njab>=0.1",
 ]
 
