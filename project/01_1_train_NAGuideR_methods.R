@@ -6,7 +6,7 @@
 #       extension: .R
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.15.0
+#       jupytext_version: 1.16.4
 #   kernelspec:
 #     display_name: R
 #     language: R
@@ -479,5 +479,5 @@ dim(pred)
 fname = file.path(folder_experiment,
                   'preds',
                   paste0('pred_all_', toupper(method), '.csv'))
-write_csv(pred, path = fname)
+write_csv(pred, fname)
 fname
