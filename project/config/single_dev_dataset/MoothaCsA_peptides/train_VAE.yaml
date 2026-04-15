@@ -1,0 +1,9 @@
+model: VAE
+file_format: csv
+latent_dim: 25
+batch_size: 10
+epochs_max: 200
+hidden_layers: '512_256'
+sample_idx_position: 0
+cuda: false
+save_pred_real_na: true

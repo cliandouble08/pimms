@@ -1,0 +1,12 @@
+FN_INTENSITIES: data/20260414_201353_20260331_PELSASPARC_MoothaCsA_FreshMitos_Astral_Report_PIMMS.csv
+index_col:
+- Sample ID
+- Feature ID
+column_names:
+- Feature ID
+fn_rawfile_metadata: data/MoothaCsA_metadata.csv
+sample_completeness: 0.5
+feat_prevalence: 0.25
+frac_mnar: 0.25
+frac_non_train: 0.1
+logarithm: log2

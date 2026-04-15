@@ -1,0 +1,8 @@
+model: CF
+file_format: csv
+latent_dim: 50
+batch_size: 4096
+epochs_max: 20
+sample_idx_position: 0
+cuda: false
+save_pred_real_na: true

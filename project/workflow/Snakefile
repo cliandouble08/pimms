@@ -10,7 +10,7 @@ configfile: "config/single_dev_dataset/proteinGroups_N50/config.yaml"
 MAX_WALLTIME = "24:00:00"
 # Thinnode resources sharing: 40 cores and 196 GB RAM (minus 2GB for snakemake)
 # JOB_RAM_MB = int(204_800 / 40 * config['THREATS_MQ'])
-JOB_RAM_MB = "4gb"
+JOB_RAM_MB = 4096
 folder_experiment = config["folder_experiment"]
 logger.info(f"{folder_experiment = }")
 

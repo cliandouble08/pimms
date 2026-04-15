@@ -1,0 +1,17 @@
+config_split: config/single_dev_dataset/MoothaCsA_peptides/split.yaml
+config_train: config/single_dev_dataset/MoothaCsA_peptides/train_{model}.yaml
+folder_experiment: runs/MoothaCsA_peptides
+fn_rawfile_metadata: data/MoothaCsA_metadata.csv
+file_format: csv
+models:
+  - Median
+  - CF
+  - DAE
+  - VAE
+  - KNN
+NAGuideR_methods:
+  - SEQKNN
+  - COLMEDIAN
+  - ROWMEDIAN
+  - KNN_IMPUTE
+  - BPCA
